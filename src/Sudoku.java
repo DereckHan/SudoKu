@@ -1,109 +1,140 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
+/**
+ * Created by Derek on 5/12/16.
+ */
 
 /**
- * Created by Derek on 5/11/16.
+ * Create Sudoku map
  */
 public class Sudoku {
-    static ArrayList<LinkedList<Integer>> squareArray = new ArrayList<LinkedList<Integer>>();
-    static ArrayList<LinkedList<Integer>> rowArray = new ArrayList<LinkedList<Integer>>();
-    static ArrayList<LinkedList<Integer>> colArray = new ArrayList<LinkedList<Integer>>();
+
+    static int[][] map = new int[9][9];
+    static int[] num = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     public static void main(String[] args) {
-        int[][] map = new int[9][9];
-        int squareNum, number;
-        fillLinkedList(squareArray, 9);
-        fillLinkedList(rowArray, 9);
-        fillLinkedList(colArray, 9);
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                if (i / 3 == 0) {
-                    int[] squareNumArray = {0, 1, 2};
-                    squareNum = squareNumArray[j / 3];
-                } else {
-                    if (i / 3 == 1) {
-                        int[] squareNumArray = {3, 4, 5};
-                        squareNum = squareNumArray[j / 3];
+        for (int i = 0; i < 9; i++) {
+            int time = 0;
+            for (int j = 0; j < 9; j++) {
+                map[i][j] = generateNum(time);
+                if (map[i][j] == 0) {
+                    if (j > 0) {
+                        j -= 2;
+                        continue;
                     } else {
-                        int[] squareNumArray = {6, 7, 8};
-                        squareNum = squareNumArray[j / 3];
-                    }
-                }
-                number = generateNumber(i, j, squareNum);
-                if (number != 0) {
-                    map[i][j] = number;
-                    System.out.println("-------i= " + i + " j= " + j + " number " + number + "-----------------");
-                    System.out.println(rowArray.get(i));
-                    System.out.println(colArray.get(j));
-                    System.out.println(squareArray.get(squareNum));
-                    rowArray.get(i).remove(rowArray.get(i).indexOf(number));
-                    colArray.get(j).remove(colArray.get(j).indexOf(number));
-                    squareArray.get(squareNum).remove(squareArray.get(squareNum).indexOf(number));
-                } else {
-                    if (j == 0) {
-                        i = i - 1;
+                        i--;
                         j = 8;
-                    } else {
-                        j--;
+                        continue;
                     }
-
                 }
-
-
+                if (checkNum(i, j)) {
+                    time = 0;
+                } else {
+                    time++;
+                    j--;
+                }
             }
-
         }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                System.out.println(map[i][j] + "|");
+                System.out.print(map[i][j] + "  ");
             }
             System.out.println();
         }
-
     }
 
-    public static void fillLinkedList(ArrayList arrayList, int number) {
-        for (int i = 0; i < number; i++) {
-            LinkedList<Integer> linkedList = new LinkedList<Integer>();
-            for (int j = 1; j < 10; j++) {
-                linkedList.add(j);
+    public static boolean checkNum(int row, int col) {
+        return (checkRow(row) & checkCol(col) & checkSquare(row, col));
+    }
+
+
+    public static boolean checkRow(int row) {
+        for (int j = 0; j < 8; j++) {
+            if (map[row][j] == 0) {
+                continue;
             }
-            arrayList.add(linkedList);
-        }
-    }
-
-    public static int generateNumber(int row, int col, int squareNum) {
-
-        ArrayList<LinkedList<Integer>> calList = new ArrayList<LinkedList<Integer>>();
-        LinkedList<Integer> possibleNum = new LinkedList<Integer>();
-        calList.add(rowArray.get(row));
-        calList.add(colArray.get(col));
-        calList.add(squareArray.get(squareNum));
-        int index = calListSize(rowArray.get(row).size(), colArray.get(col).size(), squareArray.get(squareNum).size());
-        possibleNum = calList.get(index);
-        int number, numIndex = 0;
-        while (numIndex < possibleNum.size()) {
-            number = possibleNum.get(numIndex);
-            if (calList.get(0).contains(number) && calList.get(1).contains(number) && calList.get(2).contains(number)) {
-                return number;
-            } else {
-                numIndex++;
+            for (int k = j + 1; k < 9; k++) {
+                if (map[row][j] == map[row][k]) {
+                    return false;
+                }
             }
         }
-        return 0;
+        return true;
     }
 
-    public static int calListSize(int a, int b, int c) {
-        if (a > b) {
-            if (b > c)
-                return 2;
-            else
-                return 1;
-        } else {
-            if (a > c)
-                return 2;
-            else
-                return 0;
+    /**
+     * 检查列是否符合要求
+     *
+     * @param col 检查的列号
+     * @return true代表符合要求
+     */
+    public static boolean checkCol(int col) {
+        for (int j = 0; j < 8; j++) {
+            if (map[j][col] == 0) {
+                continue;
+            }
+            for (int k = j + 1; k < 9; k++) {
+                if (map[j][col] == map[k][col]) {
+                    return false;
+                }
+            }
         }
+        return true;
+    }
+
+    /**
+     * 检查3X3区域是否符合要求
+     *
+     * @param row 检查的行号
+     * @param col 检查的列号
+     * @return true代表符合要求
+     */
+    public static boolean checkSquare(int row, int col) {
+        //获得左上角的坐标
+        int j = row / 3 * 3;
+        int k = col / 3 * 3;
+        //循环比较
+        for (int i = 0; i < 8; i++) {
+            if (map[j + i / 3][k + i % 3] == 0) {
+                continue;
+            }
+            for (int m = i + 1; m < 9; m++) {
+                if (map[j + i / 3][k + i % 3] == map[j + m / 3][k + m % 3]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 产生1-9之间的随机数字
+     * 规则：生成的随机数字放置在数组8-time下标的位置，随着time的增加，已经尝试过的数字将不会在取到
+     * 说明：即第一次次是从所有数字中随机，第二次时从前八个数字中随机，依次类推，
+     * 这样既保证随机，也不会再重复取已经不符合要求的数字，提高程序的效率
+     * 这个规则是本算法的核心
+     *
+     * @param time 填充的次数，0代表第一次填充
+     * @return
+     */
+    public static int generateNum(int time) {
+        //第一次尝试时，初始化随机数字源数组
+        if (time == 0) {
+            for (int i = 0; i < 9; i++) {
+                num[i] = i + 1;
+            }
+        }
+        //第10次填充，表明该位置已经卡住，则返回0，由主程序处理退回
+        if (time == 9) {
+            return 0;
+        }
+        //不是第一次填充
+        //生成随机数字，该数字是数组的下标，取数组num中该下标对应的数字为随机数字
+        int ranNum = (int) (Math.random() * (9 - time));
+        //把数字放置在数组倒数第time个位置，
+        int temp = num[8 - time];
+        num[8 - time] = num[ranNum];
+        num[ranNum] = temp;
+        //返回数字
+        return num[8 - time];
     }
 }
+
