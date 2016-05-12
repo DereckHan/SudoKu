@@ -14,22 +14,21 @@ public class Sudoku {
         for (int i = 0; i < 9; i++) {
             int time = 0;
             for (int j = 0; j < 9; j++) {
-                map[i][j] = generateNum(time);
+                map[i][j] = generateNum(i, j, time);
                 if (map[i][j] == 0) {
                     if (j > 0) {
                         j -= 2;
-                        continue;
                     } else {
                         i--;
                         j = 8;
-                        continue;
                     }
-                }
-                if (checkNum(i, j)) {
-                    time = 0;
                 } else {
-                    time++;
-                    j--;
+                    if (checkNum(i, j)) {
+                        time = 0;
+                    } else {
+                        time++;
+                        j--;
+                    }
                 }
             }
         }
@@ -58,82 +57,62 @@ public class Sudoku {
             }
         }
         return true;
+
     }
 
-    /**
-     * 检查列是否符合要求
-     *
-     * @param col 检查的列号
-     * @return true代表符合要求
-     */
     public static boolean checkCol(int col) {
-        for (int j = 0; j < 8; j++) {
-            if (map[j][col] == 0) {
+        for(int j = 0;j < 8;j++){
+            if(map[j][col] == 0){
                 continue;
             }
-            for (int k = j + 1; k < 9; k++) {
-                if (map[j][col] == map[k][col]) {
+            for(int k =j + 1;k< 9;k++){
+                if(map[j][col] == map[k][col]){
                     return false;
                 }
             }
         }
         return true;
+
     }
 
-    /**
-     * 检查3X3区域是否符合要求
-     *
-     * @param row 检查的行号
-     * @param col 检查的列号
-     * @return true代表符合要求
-     */
+
     public static boolean checkSquare(int row, int col) {
-        //获得左上角的坐标
+        //get the index location for the left corner
         int j = row / 3 * 3;
-        int k = col / 3 * 3;
-        //循环比较
-        for (int i = 0; i < 8; i++) {
-            if (map[j + i / 3][k + i % 3] == 0) {
+        int k = col /3 * 3;
+        for(int i = 0;i < 8;i++){
+            if(map[j + i/3][k + i % 3] == 0){
                 continue;
             }
-            for (int m = i + 1; m < 9; m++) {
-                if (map[j + i / 3][k + i % 3] == map[j + m / 3][k + m % 3]) {
+            for(int m = i+ 1;m < 9;m++){
+                if(map[j + i/3][k + i % 3] == map[j + m/3][k + m % 3]){
                     return false;
                 }
             }
         }
         return true;
+
+
     }
 
-    /**
-     * 产生1-9之间的随机数字
-     * 规则：生成的随机数字放置在数组8-time下标的位置，随着time的增加，已经尝试过的数字将不会在取到
-     * 说明：即第一次次是从所有数字中随机，第二次时从前八个数字中随机，依次类推，
-     * 这样既保证随机，也不会再重复取已经不符合要求的数字，提高程序的效率
-     * 这个规则是本算法的核心
-     *
-     * @param time 填充的次数，0代表第一次填充
-     * @return
-     */
-    public static int generateNum(int time) {
-        //第一次尝试时，初始化随机数字源数组
+    public static int generateNum(int row, int col, int time) {
+        //initialize array num
         if (time == 0) {
             for (int i = 0; i < 9; i++) {
                 num[i] = i + 1;
             }
         }
-        //第10次填充，表明该位置已经卡住，则返回0，由主程序处理退回
+        //kill this loop, roll back to previous number
         if (time == 9) {
             return 0;
         }
-        //不是第一次填充
-        //生成随机数字，该数字是数组的下标，取数组num中该下标对应的数字为随机数字
+        //get random index
         int ranNum = (int) (Math.random() * (9 - time));
-        //把数字放置在数组倒数第time个位置，
+        //get number based on the index
+        //exchange the position of number, so that only number that hasn't been used can be selected
         int temp = num[8 - time];
         num[8 - time] = num[ranNum];
         num[ranNum] = temp;
-        //返回数字
         return num[8 - time];
     }
 }
