@@ -1,109 +1,104 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
+/**
+ * Created by Derek on 5/12/16.
+ */
 
 /**
- * Created by Derek on 5/11/16.
+ * Create Sudoku map
  */
 public class Sudoku {
-    static ArrayList<LinkedList<Integer>> squareArray = new ArrayList<LinkedList<Integer>>();
-    static ArrayList<LinkedList<Integer>> rowArray = new ArrayList<LinkedList<Integer>>();
-    static ArrayList<LinkedList<Integer>> colArray = new ArrayList<LinkedList<Integer>>();
+
+    static int[][] map = new int[9][9];
+    static int[] num = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     public static void main(String[] args) {
-        int[][] map = new int[9][9];
-        int squareNum, number;
-        fillLinkedList(squareArray, 9);
-        fillLinkedList(rowArray, 9);
-        fillLinkedList(colArray, 9);
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                if (i / 3 == 0) {
-                    int[] squareNumArray = {0, 1, 2};
-                    squareNum = squareNumArray[j / 3];
-                } else {
-                    if (i / 3 == 1) {
-                        int[] squareNumArray = {3, 4, 5};
-                        squareNum = squareNumArray[j / 3];
+        for (int i = 0; i < 9; i++) {
+            int time = 0;
+            for (int j = 0; j < 9; j++) {
+                map[i][j] = generateNum(i, j, time);
+                if (map[i][j] == 0) {
+                    if (j > 0) {
+                        j -= 2;
                     } else {
-                        int[] squareNumArray = {6, 7, 8};
-                        squareNum = squareNumArray[j / 3];
-                    }
-                }
-                number = generateNumber(i, j, squareNum);
-                if (number != 0) {
-                    map[i][j] = number;
-                    System.out.println("-------i= " + i + " j= " + j + " number " + number + "-----------------");
-                    System.out.println(rowArray.get(i));
-                    System.out.println(colArray.get(j));
-                    System.out.println(squareArray.get(squareNum));
-                    rowArray.get(i).remove(rowArray.get(i).indexOf(number));
-                    colArray.get(j).remove(colArray.get(j).indexOf(number));
-                    squareArray.get(squareNum).remove(squareArray.get(squareNum).indexOf(number));
-                } else {
-                    if (j == 0) {
-                        i = i - 1;
+                        i--;
                         j = 8;
+                    }
+                } else {
+                    if (checkNum(i, j)) {
+                        time = 0;
                     } else {
+                        time++;
                         j--;
                     }
-
                 }
-
-
             }
-
         }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                System.out.println(map[i][j] + "|");
+                System.out.print(map[i][j] + "  ");
             }
             System.out.println();
         }
+    }
+
+    public static boolean checkNum(int row, int col) {
+        return (checkRow(row, col) & checkCol(row, col) & checkSquare(row, col));
+    }
+
+
+    public static boolean checkRow(int row, int col) {
+        for (int i = 0; i < col; i++) {
+            if (map[row][i] == map[row][col])
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean checkCol(int row, int col) {
+        for (int i = 0; i < row; i++) {
+            if (map[i][col] == map[row][col])
+                return false;
+        }
+        return true;
 
     }
 
-    public static void fillLinkedList(ArrayList arrayList, int number) {
-        for (int i = 0; i < number; i++) {
-            LinkedList<Integer> linkedList = new LinkedList<Integer>();
-            for (int j = 1; j < 10; j++) {
-                linkedList.add(j);
+
+    public static boolean checkSquare(int row, int col) {
+        //get the index location for the left corner
+        int rowIndex = row / 3 * 3;
+        int colIndex = col / 3 * 3;
+        int count = 0;
+        for (int i = rowIndex; i < 3 + rowIndex; i++) {
+            for (int j = colIndex; j < 3 + colIndex; j++) {
+                if (map[i][j] == map[row][col])
+                    count++;
             }
-            arrayList.add(linkedList);
         }
+        if (count == 1)
+            return true;
+        else
+            return false;
     }
 
-    public static int generateNumber(int row, int col, int squareNum) {
-
-        ArrayList<LinkedList<Integer>> calList = new ArrayList<LinkedList<Integer>>();
-        LinkedList<Integer> possibleNum = new LinkedList<Integer>();
-        calList.add(rowArray.get(row));
-        calList.add(colArray.get(col));
-        calList.add(squareArray.get(squareNum));
-        int index = calListSize(rowArray.get(row).size(), colArray.get(col).size(), squareArray.get(squareNum).size());
-        possibleNum = calList.get(index);
-        int number, numIndex = 0;
-        while (numIndex < possibleNum.size()) {
-            number = possibleNum.get(numIndex);
-            if (calList.get(0).contains(number) && calList.get(1).contains(number) && calList.get(2).contains(number)) {
-                return number;
-            } else {
-                numIndex++;
+    public static int generateNum(int row, int col, int time) {
+        //initialize array num
+        if (time == 0) {
+            for (int i = 0; i < 9; i++) {
+                num[i] = i + 1;
             }
         }
-        return 0;
-    }
-
-    public static int calListSize(int a, int b, int c) {
-        if (a > b) {
-            if (b > c)
-                return 2;
-            else
-                return 1;
-        } else {
-            if (a > c)
-                return 2;
-            else
-                return 0;
+        //kill this loop, roll back to previous number
+        if (time == 9) {
+            return 0;
         }
+        //get random index
+        int ranNum = (int) (Math.random() * (9 - time));
+        //get number based on the index
+        //exchange the position of number, so that only number that hasn't been used can be selected
+        int temp = num[8 - time];
+        num[8 - time] = num[ranNum];
+        num[ranNum] = temp;
+        return num[8 - time];
     }
 }
+
