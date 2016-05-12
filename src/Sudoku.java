@@ -41,35 +41,22 @@ public class Sudoku {
     }
 
     public static boolean checkNum(int row, int col) {
-        return (checkRow(row) & checkCol(col) & checkSquare(row, col));
+        return (checkRow(row, col) & checkCol(row, col) & checkSquare(row, col));
     }
 
 
-    public static boolean checkRow(int row) {
-        for (int j = 0; j < 8; j++) {
-            if (map[row][j] == 0) {
-                continue;
-            }
-            for (int k = j + 1; k < 9; k++) {
-                if (map[row][j] == map[row][k]) {
-                    return false;
-                }
-            }
+    public static boolean checkRow(int row, int col) {
+        for (int i = 0; i < col; i++) {
+            if (map[row][i] == map[row][col])
+                return false;
         }
         return true;
-
     }
 
-    public static boolean checkCol(int col) {
-        for(int j = 0;j < 8;j++){
-            if(map[j][col] == 0){
-                continue;
-            }
-            for(int k =j + 1;k< 9;k++){
-                if(map[j][col] == map[k][col]){
-                    return false;
-                }
-            }
+    public static boolean checkCol(int row, int col) {
+        for (int i = 0; i < row; i++) {
+            if (map[i][col] == map[row][col])
+                return false;
         }
         return true;
 
@@ -78,21 +65,19 @@ public class Sudoku {
 
     public static boolean checkSquare(int row, int col) {
         //get the index location for the left corner
-        int j = row / 3 * 3;
-        int k = col /3 * 3;
-        for(int i = 0;i < 8;i++){
-            if(map[j + i/3][k + i % 3] == 0){
-                continue;
-            }
-            for(int m = i+ 1;m < 9;m++){
-                if(map[j + i/3][k + i % 3] == map[j + m/3][k + m % 3]){
-                    return false;
-                }
+        int rowIndex = row / 3 * 3;
+        int colIndex = col / 3 * 3;
+        int count = 0;
+        for (int i = rowIndex; i < 3 + rowIndex; i++) {
+            for (int j = colIndex; j < 3 + colIndex; j++) {
+                if (map[i][j] == map[row][col])
+                    count++;
             }
         }
-        return true;
-
-
+        if (count == 1)
+            return true;
+        else
+            return false;
     }
 
     public static int generateNum(int row, int col, int time) {
