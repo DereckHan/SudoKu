@@ -4,10 +4,11 @@ import java.util.Arrays;
  * Created by Derek on 5/14/16.
  */
 public class DancingLinks {
-    public <T> void search(Head h, int depth, T[] solution) {
+    public <T> int search(Head h, int depth, T[] solution,int count) {
         if (h.right == h) {
-            System.out.println(Arrays.toString(solution));
-            return;
+            //System.out.println(Arrays.toString(solution));
+            count++;
+            return count;
         }
         ColumnHeader column = selectColumn(h);
         cover(column);
@@ -18,13 +19,14 @@ public class DancingLinks {
             for (AbstractCell column2 = row.right; column2 != row; column2 = column2.right) {
                 cover(((Cell<?>) column2).columnHeader);
             }
-            search(h, depth + 1, solution);
+            count = search(h, depth + 1, solution,count);
             // uncover columns link to row
             for (AbstractCell column2 = row.left; column2 != row; column2 = column2.left) {
                 uncover(((Cell<?>) column2).columnHeader);
             }
         }
         uncover(column);
+        return count;
     }
 
     private <T> void uncover(ColumnHeader column) {

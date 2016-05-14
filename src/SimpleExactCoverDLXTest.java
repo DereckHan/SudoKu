@@ -47,17 +47,8 @@ public class SimpleExactCoverDLXTest {
 
     public static void main(String[] args) {
         Character[] solution = new Character[7];
-        (new DancingLinks()).search(buildMatrix(), 0, solution);
+        //(new DancingLinks()).search(buildMatrix(), 0, solution);
 
     }
-//
-//    @Test
-//    public void test() {
-//        Character[] solution = new Character[6];
-//        (new DancingLinks()).search(buildMatrix(), 0, solution);
-//        assertEquals('B', solution[0].charValue());
-//        assertEquals('D', solution[1].charValue());
-//        assertEquals('F', solution[2].charValue());
-//        assertNull(solution[3]);
-//    }
+
 }
