@@ -1,5 +1,5 @@
 /**
- * Created by Dereck on 5/13/16.
+ * Created by Derek on 5/13/16.
  */
 public class SudokuSolver {
     static int[][] map = {
