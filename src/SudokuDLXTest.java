@@ -4,7 +4,7 @@
 public class SudokuDLXTest {
     private static final int[] ONE_TO_NINE = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static DancingLinks dlx = new DancingLinks();
-    static int count =0;
+    static int count = 0;
 
     static class SudokuCell {
         int x;
@@ -28,52 +28,63 @@ public class SudokuDLXTest {
     public static void main(String[] args) {
         Head h = new Head();
         ColumnHeader[] columnHeaders = DancingLinks.buildColumnHeaders(h, 324);
-        int[][] map = {
-                {6, 9, 1, 0, 0, 7, 0, 3, 0},
-                {0, 7, 0, 6, 0, 9, 0, 0, 0},
-                {0, 0, 3, 0, 2, 0, 6, 0, 0},
-                {5, 6, 4, 0, 0, 8, 3, 0, 1},
-                {1, 0, 0, 2, 0, 0, 0, 0, 0},
-                {9, 2, 8, 1, 5, 0, 4, 6, 7},
-                {0, 0, 2, 8, 9, 0, 0, 4, 3},
-                {4, 0, 6, 3, 1, 2, 0, 0, 0},
-                {0, 0, 0, 0, 0, 5, 0, 0, 0},
-        };
-        for (int i = 0; i <map.length ; i++) {
-            for (int j = 0; j <map[0].length ; j++) {
-                if(map[i][j]==0)
-                    appendSudokuCell(columnHeaders, i, j);
-                else
-                    appendSudokuCell(columnHeaders, i, j, map[i][j]);
+        SudokuCell[] solution = new SudokuCell[81];
+        int[][] map = new int[9][9];
+        map=Sudoku.createSudoku();
+        int[][] board= map;
+        while(count!=1){
+            board=map;
+            int size = 36;
+            int x,y;
+            for (int i = 0; i <36 ; i++) {
+                x=(int)(Math.random()*9);
+                y=(int)(Math.random()*9);
+                if(board[x][y]!=0){
+                    board[x][y]=0;
+                }else{
+                    i--;
+                }
+            }
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board[0].length; j++) {
+                    if (board[i][j] == 0)
+                        appendSudokuCell(columnHeaders, i, j);
+                    else
+                        appendSudokuCell(columnHeaders, i, j, board[i][j]);
+
+                }
 
             }
-
+            count = dlx.search(h, 0, solution, count);
+            if(count==1){
+                System.out.println("Before Sudoku: ");
+                printSudoku(board);
+            }
         }
-        SudokuCell[] solution = new SudokuCell[81];
-        count=dlx.search(h, 0, solution,count);
-        System.out.println(count);
-        int[][] board = new int[9][9];
         for (SudokuCell cell : solution) {
             board[cell.x][cell.y] = cell.n;
         }
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                System.out.print(board[i][j]);
-                System.out.print(' ');
-            }
-            System.out.println();
-        }
+        System.out.println("After Sudoku: ");
+        printSudoku(board);
     }
 
-    private static void appendSudokuCell(ColumnHeader[] columnHeaders, int x, int y) {
+    public static void appendSudokuCell(ColumnHeader[] columnHeaders, int x, int y) {
         for (int n : ONE_TO_NINE) {
             appendSudokuCell(columnHeaders, x, y, n);
         }
     }
 
-    private static void appendSudokuCell(ColumnHeader[] columnHeaders, int x, int y, int n) {
+    public static void appendSudokuCell(ColumnHeader[] columnHeaders, int x, int y, int n) {
         DancingLinks.appendCell(columnHeaders, new int[]{x + y * 9, y * 9 + n - 1 + 81,
                 x * 9 + n - 1 + 162, 9 * (x / 3) + 27 * (y / 3) + n - 1 + 243}, new SudokuCell(x, y, n));
+    }
+    public static void printSudoku(int[][] sudoku){
+        for (int i = 0; i <sudoku.length ; i++) {
+            for (int j = 0; j <sudoku[0].length ; j++) {
+                System.out.print(sudoku[i][j]+" ");
+            }
+            System.out.println();
+        }
     }
 
 }
