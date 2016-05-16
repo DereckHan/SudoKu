@@ -10,7 +10,7 @@ public class Sudoku {
     static int[][] map = new int[9][9];
     static int[] num = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-    public static void main(String[] args) {
+    public static int[][] createSudoku() {
         for (int i = 0; i < 9; i++) {
             int time = 0;
             for (int j = 0; j < 9; j++) {
@@ -32,12 +32,7 @@ public class Sudoku {
                 }
             }
         }
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                System.out.print(map[i][j] + "  ");
-            }
-            System.out.println();
-        }
+        return map;
     }
 
     public static boolean checkNum(int row, int col) {
